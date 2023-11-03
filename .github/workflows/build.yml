@@ -1,0 +1,31 @@
+name: Plugin Release
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Workflow Setup
+        uses: actions/checkout@v4
+      - name: Setup JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'zulu'
+      - name: Gradlew Executable
+        run: chmod +x ./gradlew
+      - name: Build Plugin
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: build
+      - name: Release Artifact
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "Release"
+          prerelease: false
+          files: |
+            build/libs/CustomHUDElement*.jar
